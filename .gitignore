@@ -1,0 +1,23 @@
+# Compiled files
+*.o
+fmirror
+obj/*
+bin/*
+
+# tmp files
+*~
+*DS_Store
+*.autosave
+
+# QtCreator and other IDE stuff
+*.pro
+*.user
+*.pri
+*.project
+*.cproject
+*.sublime-project
+*.sublime-workspace
+
+# test files
+test/*
+ToDo.md
