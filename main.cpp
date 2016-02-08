@@ -12,6 +12,14 @@
 using namespace cv;
 
 cv::CascadeClassifier face_cascade, eye_cascade;
+Mat image;
+
+bool backprojMode = false;
+bool selectObject = false;
+int trackObject = 0;
+bool showHist = true;
+int vmin = 10, vmax = 256, smin = 30;
+
 
 void detectFaces(cv::Mat& _frame, std::vector<cv::Rect>& _faces){
 
@@ -51,36 +59,21 @@ void detectFaces(cv::Mat& _frame, std::vector<cv::Rect>& _faces){
 }
 
 
-Mat image;
-
-bool backprojMode = false;
-bool selectObject = false;
-int trackObject = 0;
-bool showHist = true;
-Point origin;
-int vmin = 10, vmax = 256, smin = 30;
-
 string hot_keys =
     "\nHot keys: \n"
     "\tESC - quit the program\n"
     "\tb - switch to/from backprojection view\n"
     "\th - show/hide object histogram\n"
     "\tp - pause video\n"
-    "To initialize tracking, select the object with mouse\n";
+    "Hit any key if face is tracked correctly\n";
 
-const char* keys =
-{
-    "{help h | | show help message}{@camera_number| 0 | camera number}"
-};
-
-int main( int argc, const char** argv )
+int main()
 {
     VideoCapture cap;
     Rect trackWindow;
     int hsize = 16;
     float hranges[] = {0,180};
     const float* phranges = hranges;
-    CommandLineParser parser(argc, argv, keys);
 
     face_cascade.load("/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml");
     eye_cascade.load("/usr/local/share/OpenCV/haarcascades/haarcascade_eye_tree_eyeglasses.xml");
@@ -90,8 +83,7 @@ int main( int argc, const char** argv )
     cap.open(camNum);
 
     if( !cap.isOpened() ) {
-        std::cout << "***Could not initialize capturing...***\n";
-        std::cout << "Current parameter's value: \n";
+        std::cout << "Could not initialize capturing...\n";
         return -1;
     }
 
@@ -99,7 +91,7 @@ int main( int argc, const char** argv )
     std::cout << hot_keys;
 
     namedWindow( "Histogram", 0 );
-    namedWindow( "CamShift Demo", 0 );
+    namedWindow( "Face tracking", 0 );
 
     Mat frame, hsv, hue, mask, hist, histimg = Mat::zeros(200, 320, CV_8UC3), backproj;
     bool paused = false;
@@ -112,7 +104,7 @@ int main( int argc, const char** argv )
         std::vector<Rect> faces;
         detectFaces(frame, faces);
 
-        imshow("CamShift Demo", frame);
+        imshow("Face tracking", frame);
 
         int bigFace = 0;
         int bigArea = -INT_MAX;
@@ -126,15 +118,13 @@ int main( int argc, const char** argv )
 
         mainFace = faces[bigFace];
 
-        std::cout << "Hit any key if face is tracked correctly\n";
-
         if (waitKey(30)>=0){
             trackObject = -1;
             break;
         }
     }
 
-    std::cerr << mainFace.width << " " << mainFace.height << std::endl;
+    std::cerr << "Tracking...\n";
 
 
     while (true){
@@ -215,7 +205,7 @@ int main( int argc, const char** argv )
             bitwise_not(roi, roi);
         }
 
-        imshow( "CamShift Demo", image );
+        imshow( "Face tracking", image );
         imshow( "Histogram", histimg );
 
         char c = (char)waitKey(10);
