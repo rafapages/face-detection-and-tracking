@@ -2,11 +2,11 @@ OBJECTS = main.o
 
 LIBS = -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_objdetect -lopencv_video
 
-all: fmirror
+all: facetracking
 
-fmirror: $(OBJECTS)
-	g++ -o fmirror $(OBJECTS) $(LIBS)
+facetracking: $(OBJECTS)
+	g++ -o facetracking $(OBJECTS) $(LIBS)
 
 clean:
 	rm -f *.o
-	rm -f fmirror
+	rm -f facetracking

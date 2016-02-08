@@ -1,6 +1,6 @@
 # Compiled files
 *.o
-fmirror
+facetracking
 obj/*
 bin/*
 
